@@ -12,6 +12,6 @@ I'd still quite like something more like the old OS Locate though, and who doesn
 
 The new OS Locate UI is pretty nice when you can get to it:
 
-<img width="1116" height="1892" alt="image" src="https://github.com/user-attachments/assets/dd4d636c-e22c-433e-93bc-4827df33933f" />
+<img width="354" height="600" alt="OS Locate screenshot showing large compass ring around the OS grid coordinates" src="https://github.com/user-attachments/assets/dd4d636c-e22c-433e-93bc-4827df33933f" />
 
 To be continued...
