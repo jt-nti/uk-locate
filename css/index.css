@@ -1,0 +1,90 @@
+:root {
+  color-scheme: light dark;
+  --primary-colour: CanvasText;
+  --primary-background: Canvas;
+  --hightlight-colour: red;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: system-ui, sans-serif;
+  font-weight: normal;
+  font-size: 3vh;
+}
+
+#bearing {
+  position: fixed;
+  bottom: 85vh;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  font-size: 10vh;
+  margin-left: 0.33ch;
+  margin-bottom: 2vh;
+}
+
+#bearing p {
+  margin: 0;
+}
+
+#bearing p:after {
+  content: "°";
+}
+
+#position {
+  z-index: 20;
+  position: fixed;
+  inset: 0px;
+  width: 80vw;
+  height: 10vh;
+  max-width: 100vw;
+  max-height: 100dvh;
+  margin: auto;
+  background-color: var(--primary-background);
+  color: var(--primary-colour);
+}
+
+#position table {
+  width: 100%;
+  text-align: center;
+  font-weight: normal;
+  font-size: larger;
+}
+
+#position th {
+  font-weight: normal;
+}
+
+#position td {
+  font-weight: 600;
+}
+
+#compass {
+  transform: rotate(-285deg);
+  position: fixed;
+  top: 15vh;
+  left: -40vw;
+  width: 180vw;
+  height: 180vw;
+  border-radius: 50%;
+}
+
+#compass-graphic line.degree {
+  stroke: var(--primary-colour);
+}
+
+#compass-graphic text.degree,
+#compass-graphic text.direction {
+  fill: var(--primary-colour);
+}
+
+#compass-graphic line.north {
+  stroke: var(--hightlight-colour);
+}
+
+#compass-graphic polygon.north,
+#compass-graphic text.north {
+  fill: var(--hightlight-colour);
+}

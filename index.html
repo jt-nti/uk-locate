@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>UK Locate</title>
+
+  <link rel="stylesheet" type="text/css" href="css/normalize.css" />
+  <link rel="stylesheet" type="text/css" href="css/index.css" />
+</head>
+
+<body>
+  <header id="bearing">
+    <p id="bearing-value" aria-label="Bearing">285</p>
+  </header>
+  <main id="position">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Grid</th>
+          <th scope="col">Easting</th>
+          <th scope="col">Northing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="grid-value">SU</td>
+          <td id="easting-value">37082</td>
+          <td id="northing-value">15051</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+  <aside id="compass">
+    <svg id="compass-graphic" width="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    </svg>
+  </aside>
+
+  <script src="js/draw-compass.js"></script>
+</body>
+
+</html>
