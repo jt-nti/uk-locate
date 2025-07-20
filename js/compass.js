@@ -123,7 +123,7 @@
 
   function handleOrientation(e) {
     let orientation = quaternionToEuler(e.target.quaternion);
-    heading = compassHeading(orientation.yaw, orientation.pitch, orientation.roll) + 180;
+    let heading = compassHeading(orientation.yaw, orientation.pitch, orientation.roll) + 180;
     if (isNaN(heading)) {
       heading = 0;
     }
