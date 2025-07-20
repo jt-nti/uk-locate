@@ -14,4 +14,14 @@ The new OS Locate UI is pretty nice when you can get to it:
 
 <img width="354" height="600" alt="OS Locate screenshot showing large compass ring around the OS grid coordinates" src="https://github.com/user-attachments/assets/dd4d636c-e22c-433e-93bc-4827df33933f" />
 
+Good grief, I thought the compass would be the easy bit!
+
+https://chrishewett.com/blog/device-orientation-test-page/
+
+To test locally?
+
+```
+python3 -m http.server
+```
+
 To be continued...
