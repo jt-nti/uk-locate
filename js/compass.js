@@ -18,6 +18,11 @@
   const bearingElement = document.getElementById("bearing-value");
   const compassElement = document.getElementById("compass");
 
+  // TODO testing!
+  let orientation = quaternionToEuler([0.0017, -0.0024, -0.8434, 0.5373])
+  let heading = compassHeading(orientation.yaw, orientation.pitch, orientation.roll);
+  console.log(heading);
+
   if ('AbsoluteOrientationSensor' in window) {
     const sensor = new AbsoluteOrientationSensor();
 
@@ -30,7 +35,9 @@
     ]).then((results) => {
       if (results.every((result) => result.state === "granted")) {
         console.log("Have permission to use AbsoluteOrientationSensor.");
-        drawCompass(true);
+        // drawCompass(true);
+        // TODO the compass is borked at the moment so don't show bearings!
+        drawCompass(false);
         sensor.start();
       } else {
         console.log("No permissions to use AbsoluteOrientationSensor.");
@@ -129,12 +136,13 @@
     }
 
     compassElement.style.transform = `rotate(${-heading}deg)`;
-    bearingElement.textContent = heading;
+    // bearingElement.textContent = heading;
+    // TODO the compass is borked at the moment so don't show bearings!
   }
 
   // Function to convert quaternion to euler angles
   // https://github.com/guilyx/quaternion2euler
-  function quaternionToEuler(quaternion) {
+  function quaternionToEulerOld(quaternion) {
     const x = quaternion[0];
     const y = quaternion[1];
     const z = quaternion[2];
@@ -158,8 +166,40 @@
     const t4 = 1.0 - 2.0 * (ysqr + z * z);
     var yaw = Math.atan2(t3, t4);
 
-    return {roll, pitch, yaw};
+    return { roll, pitch, yaw };
   }
+
+  // MIT
+  // https://github.com/al-ro/volumetrics
+  /**
+ * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+ * @param {quaternion} q 
+ * @returns array of 3 Euler angles [x, y, z]
+ */
+  function quaternionToEuler(q) {
+
+    // roll (x-axis rotation)
+    var sinr_cosp = 2 * (q[3] * q[0] + q[1] * q[2]);
+    var cosr_cosp = 1 - 2 * (q[0] * q[0] + q[1] * q[1]);
+    var x = Math.atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    var y;
+    var sinp = 2 * (q[3] * q[1] - q[2] * q[0]);
+    if (Math.abs(sinp) >= 1) {
+      y = Math.copysign(Math.PI / 2, sinp); // use 90 degrees if out of range
+    } else {
+      y = Math.asin(sinp);
+    }
+
+    // yaw (z-axis rotation)
+    var siny_cosp = 2 * (q[3] * q[2] + q[0] * q[1]);
+    var cosy_cosp = 1 - 2 * (q[1] * q[1] + q[2] * q[2]);
+    var z = Math.atan2(siny_cosp, cosy_cosp);
+
+    return [x, y, z];
+  }
+
 
   // https://stackoverflow.com/a/21829819
   // TODO check unused vars
