@@ -15,13 +15,16 @@
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("compass-graphic");
 
+  const rotation = new Float32Array(16);
+
   const bearingElement = document.getElementById("bearing-value");
-  const compassElement = document.getElementById("compass");
+  // const compassElement = document.getElementById("compass");
 
   // TODO testing!
-  let orientation = quaternionToEuler([0.0017, -0.0024, -0.8434, 0.5373])
-  let heading = compassHeading(orientation.yaw, orientation.pitch, orientation.roll);
-  console.log(heading);
+  // let orientation = quaternionToEuler([0.0017, -0.0024, -0.8434, 0.5373]);
+  // console.log(orientation);
+  // let heading = compassHeading(orientation);
+  // console.log(heading);
 
   if ('AbsoluteOrientationSensor' in window) {
     const sensor = new AbsoluteOrientationSensor();
@@ -129,45 +132,30 @@
   }
 
   function handleOrientation(e) {
-    let orientation = quaternionToEuler(e.target.quaternion);
-    let heading = compassHeading(orientation.yaw, orientation.pitch, orientation.roll) + 180;
-    if (isNaN(heading)) {
-      heading = 0;
+    try {
+      e.target.populateMatrix(rotation);
+
+      console.log("Matrix");
+      console.log(rotation)
+    } catch(e) {
+      // wot no rotation
     }
 
-    compassElement.style.transform = `rotate(${-heading}deg)`;
-    // bearingElement.textContent = heading;
     // TODO the compass is borked at the moment so don't show bearings!
+    let orientation = quaternionToEuler(e.target.quaternion);
+    console.log("Euler");
+    console.log(orientation);
+
+    bearing = (180 / Math.PI * orientation[2]).toFixed(0);
+    if (isNaN(bearing)) {
+      bearing = θ;
+    }
+    bearingElement.textContent = bearing;
+
+    // TODO the compass is borked at the moment so don't show bearings!
+    // compassElement.style.transform = `rotate(${-heading}deg)`;
   }
 
-  // Function to convert quaternion to euler angles
-  // https://github.com/guilyx/quaternion2euler
-  function quaternionToEulerOld(quaternion) {
-    const x = quaternion[0];
-    const y = quaternion[1];
-    const z = quaternion[2];
-    const w = quaternion[3];
-
-    const ysqr = y * y;
-
-    // Roll (x-axis rotation)
-    const t0 = 2.0 * (w * x + y * z);
-    const t1 = 1.0 - 2.0 * (x * x + ysqr);
-    var roll = Math.atan2(t0, t1);
-
-    // Pitch (y-axis rotation)
-    let t2 = 2.0 * (w * y - z * x);
-    t2 = t2 > 1.0 ? 1.0 : t2;
-    t2 = t2 < -1.0 ? -1.0 : t2;
-    var pitch = Math.asin(t2);
-
-    // Yaw (z-axis rotation)
-    const t3 = 2.0 * (w * z + x * y);
-    const t4 = 1.0 - 2.0 * (ysqr + z * z);
-    var yaw = Math.atan2(t3, t4);
-
-    return { roll, pitch, yaw };
-  }
 
   // MIT
   // https://github.com/al-ro/volumetrics
@@ -198,40 +186,6 @@
     var z = Math.atan2(siny_cosp, cosy_cosp);
 
     return [x, y, z];
-  }
-
-
-  // https://stackoverflow.com/a/21829819
-  // TODO check unused vars
-  function compassHeading(alphaRad, betaRad, gammaRad) {
-
-    // Calculate equation components
-    var cA = Math.cos(alphaRad);
-    var sA = Math.sin(alphaRad);
-    // var cB = Math.cos(betaRad);
-    var sB = Math.sin(betaRad);
-    var cG = Math.cos(gammaRad);
-    var sG = Math.sin(gammaRad);
-
-    // Calculate A, B, C rotation components
-    var rA = - cA * sG - sA * sB * cG;
-    var rB = - sA * sG + cA * sB * cG;
-    // var rC = - cB * cG;
-
-    // Calculate compass heading
-    var compassHeading = Math.atan(rA / rB);
-
-    // Convert from half unit circle to whole unit circle
-    if (rB < 0) {
-      compassHeading += Math.PI;
-    } else if (rA < 0) {
-      compassHeading += 2 * Math.PI;
-    }
-
-    // Convert radians to degrees
-    compassHeading *= 180 / Math.PI;
-
-    return compassHeading;
   }
 
 }());

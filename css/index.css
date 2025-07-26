@@ -25,7 +25,8 @@ header {
   width: 100%;
   text-align: center;
   font-weight: 600;
-  font-size: 10vh;
+  /* font-size: 10vh; */
+  font-size: 4vh;
   margin-left: 0.33ch;
 }
 
@@ -33,7 +34,7 @@ header {
   margin: 0;
 }
 
-#bearing p:after {
+p#bearing-value:after {
   content: "°";
 }
 
