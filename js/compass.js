@@ -18,7 +18,7 @@
   const rotation = new Float32Array(16);
 
   const bearingElement = document.getElementById("bearing-value");
-  // const compassElement = document.getElementById("compass");
+  const compassElement = document.getElementById("compass");
 
   // TODO testing!
   // let orientation = quaternionToEuler([0.0017, -0.0024, -0.8434, 0.5373]);
@@ -145,8 +145,8 @@
     console.log(orientation);
 
     var heading = compassHeading(orientation[2], orientation[0], orientation[1]);
-    if (isNaN(bearing)) {
-      heading = θ;
+    if (isNaN(heading)) {
+      heading = "θ";
     }
     bearingElement.textContent = heading;
 
