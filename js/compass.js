@@ -217,7 +217,7 @@
     // Convert radians to degrees
     compassHeading *= 180 / Math.PI;
 
-    return compassHeading;
+    return compassHeading.toFixed(0);
   }
 
 }());
