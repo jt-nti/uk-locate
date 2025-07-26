@@ -38,9 +38,7 @@
     ]).then((results) => {
       if (results.every((result) => result.state === "granted")) {
         console.log("Have permission to use AbsoluteOrientationSensor.");
-        // drawCompass(true);
-        // TODO the compass is borked at the moment so don't show bearings!
-        drawCompass(false);
+        drawCompass(true);
         sensor.start();
       } else {
         console.log("No permissions to use AbsoluteOrientationSensor.");
@@ -146,14 +144,14 @@
     console.log("Euler");
     console.log(orientation);
 
-    bearing = (180 / Math.PI * orientation[2]).toFixed(0);
+    var heading = compassHeading(orientation[2], orientation[0], orientation[1]);
     if (isNaN(bearing)) {
-      bearing = θ;
+      heading = θ;
     }
-    bearingElement.textContent = bearing;
+    bearingElement.textContent = heading;
 
     // TODO the compass is borked at the moment so don't show bearings!
-    // compassElement.style.transform = `rotate(${-heading}deg)`;
+    compassElement.style.transform = `rotate(${-heading}deg)`;
   }
 
 
@@ -186,6 +184,40 @@
     var z = Math.atan2(siny_cosp, cosy_cosp);
 
     return [x, y, z];
+  }
+
+  // https://github.com/AR-js-org/AR.js/blob/master/aframe/src/location-based/gps-camera.js
+  function compassHeading(alphaRad, betaRad, gammaRad) {
+    // Convert degrees to radians
+    // var alphaRad = alpha * (Math.PI / 180);
+    // var betaRad = beta * (Math.PI / 180);
+    // var gammaRad = gamma * (Math.PI / 180);
+
+    // Calculate equation components
+    var cA = Math.cos(alphaRad);
+    var sA = Math.sin(alphaRad);
+    var sB = Math.sin(betaRad);
+    var cG = Math.cos(gammaRad);
+    var sG = Math.sin(gammaRad);
+
+    // Calculate A, B, C rotation components
+    var rA = -cA * sG - sA * sB * cG;
+    var rB = -sA * sG + cA * sB * cG;
+
+    // Calculate compass heading
+    var compassHeading = Math.atan(rA / rB);
+
+    // Convert from half unit circle to whole unit circle
+    if (rB < 0) {
+      compassHeading += Math.PI;
+    } else if (rA < 0) {
+      compassHeading += 2 * Math.PI;
+    }
+
+    // Convert radians to degrees
+    compassHeading *= 180 / Math.PI;
+
+    return compassHeading;
   }
 
 }());
