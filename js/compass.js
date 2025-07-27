@@ -15,19 +15,17 @@
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("compass-graphic");
 
-  const rotation = new Float32Array(16);
+  // const rotation = new Float32Array(16);
 
   const bearingElement = document.getElementById("bearing-value");
   const compassElement = document.getElementById("compass");
 
   // TODO testing!
-  // let orientation = quaternionToEuler([0.0017, -0.0024, -0.8434, 0.5373]);
-  // console.log(orientation);
-  // let heading = compassHeading(orientation);
-  // console.log(heading);
+  // let test1 = compassHeading([0.0393, -0.0077, 0.2812, 0.9588]);
+  // console.log("test1: " + test1);
 
   if ('AbsoluteOrientationSensor' in window) {
-    const sensor = new AbsoluteOrientationSensor();
+    const sensor = new AbsoluteOrientationSensor({ frequency: 1 });
 
     sensor.addEventListener("reading", (e) => handleOrientation(e));
 
@@ -130,30 +128,35 @@
   }
 
   function handleOrientation(e) {
-    try {
-      e.target.populateMatrix(rotation);
-
-      console.log("Matrix");
-      console.log(rotation)
-    } catch(e) {
-      // wot no rotation
-    }
-
-    // TODO the compass is borked at the moment so don't show bearings!
-    let orientation = quaternionToEuler(e.target.quaternion);
-    console.log("Euler");
-    console.log(orientation);
-
-    var heading = compassHeading(orientation[2], orientation[0], orientation[1]);
+    var heading = compassHeading(e.target.quaternion);
     if (isNaN(heading)) {
       heading = "θ";
+    } else {
+      compassElement.style.transform = `rotate(${-heading}deg)`;
     }
-    bearingElement.textContent = heading;
 
-    // TODO the compass is borked at the moment so don't show bearings!
-    compassElement.style.transform = `rotate(${-heading}deg)`;
+    bearingElement.textContent = heading;
   }
 
+  // https://www.parkertimmins.com/2020/06/03/azimuth-altitude.html
+  function compassHeading(q) {
+    let orientation = quaternionToEuler(q);
+
+    // Calculate compass heading
+    var compassHeading = Math.atan(orientation[1] / orientation[0]);
+
+    // Convert from half unit circle to whole unit circle
+    if (orientation[0] < 0) {
+      compassHeading += Math.PI;
+    } else if (orientation[1] < 0) {
+      compassHeading += 2 * Math.PI;
+    }
+
+    // Convert radians to degrees
+    compassHeading *= 180 / Math.PI;
+
+    return compassHeading.toFixed(0);
+  }
 
   // MIT
   // https://github.com/al-ro/volumetrics
@@ -184,40 +187,6 @@
     var z = Math.atan2(siny_cosp, cosy_cosp);
 
     return [x, y, z];
-  }
-
-  // https://github.com/AR-js-org/AR.js/blob/master/aframe/src/location-based/gps-camera.js
-  function compassHeading(alphaRad, betaRad, gammaRad) {
-    // Convert degrees to radians
-    // var alphaRad = alpha * (Math.PI / 180);
-    // var betaRad = beta * (Math.PI / 180);
-    // var gammaRad = gamma * (Math.PI / 180);
-
-    // Calculate equation components
-    var cA = Math.cos(alphaRad);
-    var sA = Math.sin(alphaRad);
-    var sB = Math.sin(betaRad);
-    var cG = Math.cos(gammaRad);
-    var sG = Math.sin(gammaRad);
-
-    // Calculate A, B, C rotation components
-    var rA = -cA * sG - sA * sB * cG;
-    var rB = -sA * sG + cA * sB * cG;
-
-    // Calculate compass heading
-    var compassHeading = Math.atan(rA / rB);
-
-    // Convert from half unit circle to whole unit circle
-    if (rB < 0) {
-      compassHeading += Math.PI;
-    } else if (rA < 0) {
-      compassHeading += 2 * Math.PI;
-    }
-
-    // Convert radians to degrees
-    compassHeading *= 180 / Math.PI;
-
-    return compassHeading.toFixed(0);
   }
 
 }());
