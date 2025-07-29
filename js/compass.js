@@ -7,7 +7,8 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Also do compass stuff see below for bearing/heading
- *   // https://stackoverflow.com/a/21829819
+ * See https://www.parkertimmins.com/2020/06/03/azimuth-altitude.html for
+ * an explanation.
  */
 (function () {
   "use strict";
@@ -20,9 +21,14 @@
   const bearingElement = document.getElementById("bearing-value");
   const compassElement = document.getElementById("compass");
 
-  // TODO testing!
-  // let test1 = compassHeading([0.0393, -0.0077, 0.2812, 0.9588]);
-  // console.log("test1: " + test1);
+  // TODO just testing!
+  // let tnorth = compassHeading([0.08, 0.00, 0.01, 1.00]);
+  // let teast = compassHeading([0.03, -0.07, -0.86, 0.50]);
+  // let tsouth = compassHeading([0.03, 0.08, 0.98, 0.17]);
+  // let twest = compassHeading([0.02, 0.02, 0.67, 0.74]);
+  // let tup = compassHeading([0.52, -0.39, -0.48, 0.59]);
+  // let tdown = compassHeading([-0.66, 0.17, -0.17, 0.72]);
+  // let trandom = compassHeading([-0.17, -0.44, -0.88, 0.06]);
 
   if ('AbsoluteOrientationSensor' in window) {
     const sensor = new AbsoluteOrientationSensor({ frequency: 1 });
@@ -138,55 +144,20 @@
     bearingElement.textContent = heading;
   }
 
-  // https://www.parkertimmins.com/2020/06/03/azimuth-altitude.html
+  // https://github.com/IndoorAtlas/cordova-plugin/blob/8df9279bd75aabff78c8d2f34fcbf44d62a38844/www/Orientation.js
+  // Copyright 2016 IndoorAtlas
   function compassHeading(q) {
-    let orientation = quaternionToEuler(q);
+    const qw = q[3];
+    const qx = q[0];
+    const qy = q[1];
+    const qz = q[2];
 
-    // Calculate compass heading
-    var compassHeading = Math.atan(orientation[1] / orientation[0]);
+    const yawRad = -Math.atan2(2.0 * (qw * qz + qx * qy), 1.0 - 2.0 * (qy * qy + qz * qz));
 
-    // Convert from half unit circle to whole unit circle
-    if (orientation[0] < 0) {
-      compassHeading += Math.PI;
-    } else if (orientation[1] < 0) {
-      compassHeading += 2 * Math.PI;
-    }
+    const yawDeg = yawRad / Math.PI * 180.0;
 
-    // Convert radians to degrees
-    compassHeading *= 180 / Math.PI;
+    const compassHeading = (yawDeg + 360) % 360;
 
-    return compassHeading.toFixed(0);
+    return compassHeading.toFixed(0);;
   }
-
-  // MIT
-  // https://github.com/al-ro/volumetrics
-  /**
- * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
- * @param {quaternion} q 
- * @returns array of 3 Euler angles [x, y, z]
- */
-  function quaternionToEuler(q) {
-
-    // roll (x-axis rotation)
-    var sinr_cosp = 2 * (q[3] * q[0] + q[1] * q[2]);
-    var cosr_cosp = 1 - 2 * (q[0] * q[0] + q[1] * q[1]);
-    var x = Math.atan2(sinr_cosp, cosr_cosp);
-
-    // pitch (y-axis rotation)
-    var y;
-    var sinp = 2 * (q[3] * q[1] - q[2] * q[0]);
-    if (Math.abs(sinp) >= 1) {
-      y = Math.copysign(Math.PI / 2, sinp); // use 90 degrees if out of range
-    } else {
-      y = Math.asin(sinp);
-    }
-
-    // yaw (z-axis rotation)
-    var siny_cosp = 2 * (q[3] * q[2] + q[0] * q[1]);
-    var cosy_cosp = 1 - 2 * (q[1] * q[1] + q[2] * q[2]);
-    var z = Math.atan2(siny_cosp, cosy_cosp);
-
-    return [x, y, z];
-  }
-
 }());
