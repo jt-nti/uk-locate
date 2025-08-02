@@ -31,7 +31,7 @@
   // let trandom = compassHeading([-0.17, -0.44, -0.88, 0.06]);
 
   if ('AbsoluteOrientationSensor' in window) {
-    const sensor = new AbsoluteOrientationSensor({ frequency: 1 });
+    const sensor = new AbsoluteOrientationSensor({ frequency: 6 });
 
     sensor.addEventListener("reading", (e) => handleOrientation(e));
 
